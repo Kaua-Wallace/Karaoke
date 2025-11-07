@@ -68,7 +68,7 @@ def main_terminal_ui(stdscr, metadata, lyrics, mp3_path):
     curses.start_color()
     curses.use_default_colors() # Usa cores padrão do terminal
     # Cria o par de cores 1: Texto preto em fundo branco (para o destaque)
-# Letra AMARELA, fundo do terminal (padrão)
+    # Letra AMARELA, fundo do terminal (padrão)
     curses.init_pair(1, curses.COLOR_YELLOW, -1)    
     # Toca a música
     pygame.mixer.music.play()
@@ -104,28 +104,35 @@ def main_terminal_ui(stdscr, metadata, lyrics, mp3_path):
             # Desenha o Título e o Artista
             title = metadata.get('ti', 'Título Desconhecido')
             artist = metadata.get('ar', 'Artista Desconhecido')
+
+            # Garante que o texto não ultrapasse a largura da tela
             
-            header = f"{title} -{artist}"
-            # Centraliza o cabeçalho
-            header_x = (max_x - len(header)) // 2
-            stdscr.addstr(0, max(0, header_x), header)
-            
+            title_line = title[:max_x - 2]   # -2 para margem
+            artist_line = artist[:max_x - 2] # -2 para margem
+
+            # Adiciona o artista no canto esquerdo (linha 0)
+            stdscr.addstr(0, 1, artist_line, curses.A_BOLD) # Em negrito
+
+            # Adiciona o título no canto esquerdo (linha 1)
+            stdscr.addstr(1, 1, title_line, curses.A_BOLD) #em negrito
+
             # 4. Desenhar as Letras
-            # Define o início da rolagem (para centralizar a linha atual)
+            # Define o início da rolagem (para centralizar la linha atual)
             start_line = 0
             if current_line_index != -1:
                 # Tenta centralizar a linha ativa na vertical
                 start_line = max(0, current_line_index - (max_y // 3))
-            
+
             # Itera e desenha apenas as linhas visíveis
             for i in range(start_line, len(lyrics)):
                 # Calcula a posição Y na tela
-                screen_y = (i - start_line) + 2 # +2 para pular o cabeçalho
-                
+                # +3 para pular o artista e o título 
+                screen_y = (i - start_line) + 3
+
                 # Para de desenhar se passar da borda da tela
                 if screen_y >= max_y - 1: # -1 para deixar uma margem
                     break
-                
+
                 timestamp, line_text = lyrics[i]
                 
                 # Garante que o texto não ultrapasse a largura da tela
